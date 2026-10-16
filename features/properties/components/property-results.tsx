@@ -57,7 +57,7 @@ export async function PropertyResults({
       <p className="mb-6 text-sm text-foreground/60">
         {properties.length} {properties.length === 1 ? "property" : "properties"} found
       </p>
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
         {properties.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}

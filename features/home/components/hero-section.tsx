@@ -7,7 +7,7 @@ export function HeroSection() {
   return (
     <section className="relative flex min-h-[560px] items-center justify-center overflow-hidden">
       <Image
-        src="https://picsum.photos/seed/prime-hero/1920/1080"
+        src="/images/hero.jpg"
         alt=""
         fill
         priority
