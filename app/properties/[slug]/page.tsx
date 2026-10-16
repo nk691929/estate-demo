@@ -10,6 +10,8 @@ import {
   getAllPropertySlugs,
   getPropertyBySlug,
 } from "@/features/properties/services/property.service";
+import { InquiryForm } from "@/features/inquiries/components/inquiry-form";
+
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -152,6 +154,10 @@ export default async function PropertyPage({ params }: Props) {
             <Phone className="size-4" />
             Call {siteConfig.phone}
           </a>
+
+          <div className="border-t border-foreground/10 pt-4">
+            <InquiryForm propertyTitle={property.title} />
+          </div>
         </aside>
       </div>
     </main>

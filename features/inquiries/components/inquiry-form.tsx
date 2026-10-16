@@ -1,0 +1,85 @@
+"use client";
+
+import { useState } from "react";
+
+type Errors = { name?: string; phone?: string };
+
+const fieldClass =
+  "h-11 w-full rounded-lg border border-foreground/20 bg-background px-3 text-sm outline-none focus:border-foreground";
+
+export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
+  const [errors, setErrors] = useState<Errors>({});
+  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const data = new FormData(event.currentTarget);
+    const name = String(data.get("name") ?? "").trim();
+    const phone = String(data.get("phone") ?? "").trim();
+
+    const nextErrors: Errors = {};
+    if (name.length < 2) nextErrors.name = "Please enter your name";
+    if (phone.replace(/\D/g, "").length < 10)
+      nextErrors.phone = "Enter a valid phone number";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    setStatus("sending");
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setStatus("sent");
+  }
+
+  if (status === "sent") {
+    return (
+      <div className="rounded-lg bg-green-600/10 p-4 text-sm">
+        <p className="font-semibold">Thank you!</p>
+        <p className="mt-1 text-foreground/70">
+          We received your inquiry about this property and will contact you
+          shortly.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} noValidate className="space-y-3">
+      <p className="font-semibold">Send an inquiry</p>
+
+      <div>
+        <input name="name" placeholder="Your name" className={fieldClass} />
+        {errors.name && (
+          <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+        )}
+      </div>
+
+      <div>
+        <input
+          name="phone"
+          type="tel"
+          placeholder="Phone number"
+          className={fieldClass}
+        />
+        {errors.phone && (
+          <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+        )}
+      </div>
+
+      <textarea
+        name="message"
+        rows={3}
+        defaultValue={`Hello, I am interested in: ${propertyTitle}`}
+        className="w-full rounded-lg border border-foreground/20 bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
+      />
+
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        className="h-11 w-full rounded-lg bg-foreground font-medium text-background transition hover:opacity-80 disabled:opacity-50"
+      >
+        {status === "sending" ? "Sending..." : "Send inquiry"}
+      </button>
+    </form>
+  );
+}
