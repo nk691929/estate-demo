@@ -53,7 +53,7 @@ export default function AboutPage() {
 
         <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
           <Image
-            src="https://picsum.photos/seed/about-office/1200/900"
+            src="/images/properties/about.jpg"
             alt="Our office"
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"

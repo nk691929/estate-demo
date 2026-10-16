@@ -9,7 +9,7 @@ export const mockAgents: Agent[] = [
     phone: "+92 300 1234567",
     whatsapp: "923001234567",
     email: "ahmed@primeestates.com",
-    photo: "https://picsum.photos/seed/agent-ahmed/600/600",
+    photo: "/images/agents/ahmed-raza.jpg",
     experienceYears: 12,
   },
   {
@@ -20,7 +20,7 @@ export const mockAgents: Agent[] = [
     phone: "+92 321 7654321",
     whatsapp: "923217654321",
     email: "sara@primeestates.com",
-    photo: "https://picsum.photos/seed/agent-sara/600/600",
+    photo: "/images/agents/sara-khan.jpg",
     experienceYears: 8,
   },
 ];

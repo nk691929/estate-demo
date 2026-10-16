@@ -96,8 +96,8 @@ export const mockProperties: Property[] = [
     size: 10,
     sizeUnit: "marla",
     images: [
-      "https://picsum.photos/seed/estate4a/1200/800",
-      "https://picsum.photos/seed/estate4b/1200/800",
+      "/images/properties/plot-1.jpg",
+      "/images/properties/plot-2.jpg",
     ],
     features: ["Corner", "Near Park", "Possession Ready"],
     featured: true,
@@ -120,8 +120,8 @@ export const mockProperties: Property[] = [
     size: 600,
     sizeUnit: "sqft",
     images: [
-      "https://picsum.photos/seed/estate5a/1200/800",
-      "https://picsum.photos/seed/estate5b/1200/800",
+      "/images/properties/shop-1.jpg",
+      "/images/properties/shop-2.jpg",
     ],
     features: ["Main Road", "Ground Floor", "Rental Income"],
     featured: false,
@@ -146,9 +146,7 @@ export const mockProperties: Property[] = [
     size: 7,
     sizeUnit: "marla",
     images: [
-      "https://picsum.photos/seed/estate6a/1200/800",
-      "https://picsum.photos/seed/estate6b/1200/800",
-      "https://picsum.photos/seed/estate6c/1200/800",
+      "/images/properties/garden.jpg",
     ],
     features: ["Lawn", "Parking", "Gas", "Near Market"],
     featured: true,
