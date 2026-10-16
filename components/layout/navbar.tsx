@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Building2, Phone } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
+import { MobileMenu } from "./mobile-menu";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -32,13 +33,16 @@ export function Navbar() {
           ))}
         </nav>
 
-        <a
-          href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
-          className="flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:opacity-80"
-        >
-          <Phone className="size-4" />
-          Call us
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
+            className="flex items-center gap-2 rounded-full bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:opacity-80"
+          >
+            <Phone className="size-4" />
+            Call us
+          </a>
+          <MobileMenu links={navLinks} />
+        </div>
       </div>
     </header>
   );
