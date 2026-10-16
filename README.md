@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prime Estates: Real Estate Website (Demo MVP)
 
-## Getting Started
+A fast, SEO-ready real estate website built with Next.js. It runs on mock data so it can be shown to clients before a backend exists.
 
-First, run the development server:
+## Tech stack
+
+- Next.js (App Router) + TypeScript
+- Tailwind CSS
+- lucide-react icons
+- Mock data layer (swap for a database later)
+
+## Pages
+
+| Route | Purpose |
+|---|---|
+| `/` | Home: hero, search, featured properties |
+| `/properties` | Listings with filters kept in the URL |
+| `/properties/[slug]` | Property detail, gallery, WhatsApp and inquiry form |
+| `/agents` | Agent profiles |
+| `/about` | About the agency |
+| `/contact` | Contact details and message form |
+| `/sitemap.xml`, `/robots.txt` | SEO files, generated from the data |
+
+## Getting started
+
+Requires Node.js 20 or newer.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Before deploying, check the production build:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/            Routing only (pages, layout, SEO files)
+components/     Shared UI (navbar, footer, mobile menu)
+features/       Business logic, grouped by feature
+  properties/   types, mock data, service, card, search form, results
+  agents/       types, mock data, service, card
+  inquiries/    server actions and forms
+  home/         home page sections
+config/         site.ts: name, contact details, URL
+lib/            Small helpers (price and size formatting)
+public/images/  Photos used by the site
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The rule: **pages never read data directly.** They call a service, and the service reads the data. Moving from mock data to a real database means changing only the files in `services/`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Rebranding for a new client
 
-## Deploy on Vercel
+1. Edit `config/site.ts` (name, tagline, phone, WhatsApp, email, address, URL).
+2. Replace the photos in `public/images/` and update the paths in `features/properties/data/mock-properties.ts` and `features/agents/data/mock-agents.ts`.
+3. Update the sample numbers in `app/about/page.tsx`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Current limitations (demo)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Properties and agents come from local mock files.
+- Inquiry and contact forms run as server actions that **log to the server console**. They do not save or email anything yet.
+- Photos are stock images and must be replaced with the client's own.
+
+## Planned next phase
+
+- Database (Supabase or Firebase) for properties, agents and inquiries
+- Admin / CRM dashboard to manage listings and leads
+- Email or WhatsApp notification for new inquiries
+- Structured data (JSON-LD) for property pages
