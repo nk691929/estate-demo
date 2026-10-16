@@ -7,5 +7,5 @@ export const siteConfig = {
   whatsapp: "923087121091",
   email: "info@nexymark.com",
   address: "Gulberg III, Lahore, Pakistan",
-  url: "http://localhost:3000",
+  url: "https://estate-demo-nu.vercel.app/",
 };
