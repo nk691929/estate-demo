@@ -30,3 +30,36 @@ export async function submitInquiry(
 
   return { ok: true };
 }
+
+export type ContactInput = {
+  name: string;
+  phone: string;
+  email: string;
+  message: string;
+};
+
+export async function submitContact(
+  input: ContactInput
+): Promise<InquiryResult> {
+  const name = input.name.trim();
+  const phone = input.phone.trim();
+  const message = input.message.trim();
+
+  if (
+    name.length < 2 ||
+    phone.replace(/\D/g, "").length < 10 ||
+    message.length < 5
+  ) {
+    return { ok: false, error: "Please check your details and message." };
+  }
+
+  console.log("New contact message:", {
+    name,
+    phone,
+    email: input.email.trim(),
+    message,
+    receivedAt: new Date().toISOString(),
+  });
+
+  return { ok: true };
+}
