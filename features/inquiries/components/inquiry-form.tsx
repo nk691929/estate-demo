@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { submitInquiry } from "../actions";
+
 type Errors = { name?: string; phone?: string };
 
 const fieldClass =
@@ -9,6 +11,7 @@ const fieldClass =
 
 export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
   const [errors, setErrors] = useState<Errors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -17,6 +20,7 @@ export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") ?? "").trim();
     const phone = String(data.get("phone") ?? "").trim();
+    const message = String(data.get("message") ?? "");
 
     const nextErrors: Errors = {};
     if (name.length < 2) nextErrors.name = "Please enter your name";
@@ -27,8 +31,16 @@ export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
     if (Object.keys(nextErrors).length > 0) return;
 
     setStatus("sending");
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setStatus("sent");
+    setServerError(null);
+
+    const result = await submitInquiry({ name, phone, message, propertyTitle });
+
+    if (result.ok) {
+      setStatus("sent");
+    } else {
+      setStatus("idle");
+      setServerError(result.error);
+    }
   }
 
   if (status === "sent") {
@@ -72,6 +84,8 @@ export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
         defaultValue={`Hello, I am interested in: ${propertyTitle}`}
         className="w-full rounded-lg border border-foreground/20 bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
       />
+
+      {serverError && <p className="text-xs text-red-500">{serverError}</p>}
 
       <button
         type="submit"
