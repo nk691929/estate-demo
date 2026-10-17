@@ -19,4 +19,5 @@ export interface Lead {
   propertyTitle?: string;
   status: LeadStatus;
   createdAt: string;
+  notes: string;
 }

@@ -14,6 +14,7 @@ type LeadRow = {
   property_title: string | null;
   status: LeadStatus;
   created_at: string;
+  notes: string;
 };
 
 function toLead(row: LeadRow): Lead {
@@ -28,6 +29,7 @@ function toLead(row: LeadRow): Lead {
     propertyTitle: row.property_title ?? undefined,
     status: row.status,
     createdAt: row.created_at,
+    notes: row.notes,
   };
 }
 

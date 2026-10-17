@@ -4,6 +4,7 @@ import { ArrowLeft, MessageCircle, Phone } from "lucide-react";
 import { requireAdmin } from "@/features/auth/require-admin";
 import { getLeads } from "@/features/leads/services/lead.service";
 import type { LeadStatus } from "@/features/leads/types";
+import { LeadEditor } from "@/features/leads/components/lead-editor";
 
 const statusStyles: Record<LeadStatus, string> = {
   new: "bg-blue-500/15 text-blue-400",
@@ -109,6 +110,7 @@ export default async function LeadsPage() {
                   </a>
                 )}
               </div>
+              <LeadEditor lead={lead} />
             </li>
           ))}
         </ul>
