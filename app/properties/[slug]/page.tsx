@@ -189,7 +189,7 @@ export default async function PropertyPage({ params }: Props) {
           </a>
 
           <div className="border-t border-foreground/10 pt-4">
-            <InquiryForm propertyTitle={property.title} />
+            <InquiryForm propertyId={property.id} propertyTitle={property.title} />
           </div>
         </aside>
       </div>

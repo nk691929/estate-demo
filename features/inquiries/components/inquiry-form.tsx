@@ -9,7 +9,13 @@ type Errors = { name?: string; phone?: string };
 const fieldClass =
   "h-11 w-full rounded-lg border border-foreground/20 bg-background px-3 text-sm outline-none focus:border-foreground";
 
-export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
+export function InquiryForm({
+  propertyId,
+  propertyTitle,
+}: {
+  propertyId: string;
+  propertyTitle: string;
+}) {
   const [errors, setErrors] = useState<Errors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
@@ -33,7 +39,13 @@ export function InquiryForm({ propertyTitle }: { propertyTitle: string }) {
     setStatus("sending");
     setServerError(null);
 
-    const result = await submitInquiry({ name, phone, message, propertyTitle });
+    const result = await submitInquiry({
+      name,
+      phone,
+      message,
+      propertyId,
+      propertyTitle,
+    });
 
     if (result.ok) {
       setStatus("sent");
