@@ -11,6 +11,7 @@ import {
   getPropertyBySlug,
 } from "@/features/properties/services/property.service";
 import { InquiryForm } from "@/features/inquiries/components/inquiry-form";
+import { JsonLd } from "@/components/seo/json-ld";
 
 
 type Props = { params: Promise<{ slug: string }> };
@@ -43,9 +44,41 @@ export default async function PropertyPage({ params }: Props) {
   const whatsappText = encodeURIComponent(
     `Hello, I am interested in: ${property.title}`
   );
+  const toAbsolute = (src: string) =>
+    src.startsWith("http") ? src : `${siteConfig.url}${src}`;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: property.title,
+    description: property.description,
+    url: `${siteConfig.url}/properties/${property.slug}`,
+    image: property.images.map(toAbsolute),
+    offers: {
+      "@type": "Offer",
+      price: property.price,
+      priceCurrency: "PKR",
+      availability: "https://schema.org/InStock",
+    },
+    about: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: property.address,
+        addressLocality: property.city,
+        addressCountry: "PK",
+      },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: property.latitude,
+        longitude: property.longitude,
+      },
+    },
+  };
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
+      <JsonLd data={jsonLd} />
       <Link
         href="/properties"
         className="mb-6 inline-flex items-center gap-2 text-sm text-foreground/70 hover:text-foreground"
