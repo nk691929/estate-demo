@@ -18,6 +18,12 @@ export default async function AdminPage() {
         >
           View leads
         </Link>
+        <Link
+          href="/admin/properties"
+          className="rounded-lg bg-foreground px-5 py-3 text-sm font-medium text-background transition hover:opacity-80"
+        >
+          Manage properties
+        </Link>
 
         <form action={signOut}>
           <button

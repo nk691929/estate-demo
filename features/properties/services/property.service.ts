@@ -17,7 +17,7 @@ export interface PropertyFilters {
   bedrooms?: number;
 }
 
-type PropertyRow = {
+export type PropertyRow = {
   id: string;
   slug: string;
   title: string;
@@ -40,7 +40,7 @@ type PropertyRow = {
   longitude: number;
 };
 
-function toProperty(row: PropertyRow): Property {
+export function toProperty(row: PropertyRow): Property {
   return {
     id: row.id,
     slug: row.slug,
