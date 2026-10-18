@@ -8,6 +8,7 @@ export type InquiryInput = {
   message: string;
   propertyId: string;
   propertyTitle: string;
+  trap?: string;
 };
 
 export type ContactInput = {
@@ -15,20 +16,32 @@ export type ContactInput = {
   phone: string;
   email: string;
   message: string;
+  trap?: string;
 };
 
 export type InquiryResult = { ok: true } | { ok: false; error: string };
 
 const GENERIC_ERROR =
   "Something went wrong. Please try again or contact us on WhatsApp.";
+const TOO_MANY_ERROR =
+  "You have sent several messages recently. Please wait a while, or contact us on WhatsApp.";
 
 function isValidPhone(phone: string) {
   return phone.replace(/\D/g, "").length >= 10;
 }
 
+function failureMessage(error: { message: string }) {
+  return error.message.includes("Too many submissions")
+    ? TOO_MANY_ERROR
+    : GENERIC_ERROR;
+}
+
 export async function submitInquiry(
   input: InquiryInput
 ): Promise<InquiryResult> {
+  // A real person never sees or fills the hidden field. Pretend it worked.
+  if (input.trap && input.trap.trim() !== "") return { ok: true };
+
   const name = input.name.trim().slice(0, 100);
   const phone = input.phone.trim().slice(0, 30);
 
@@ -47,7 +60,7 @@ export async function submitInquiry(
 
   if (error) {
     console.error("Could not save inquiry:", error.message);
-    return { ok: false, error: GENERIC_ERROR };
+    return { ok: false, error: failureMessage(error) };
   }
 
   return { ok: true };
@@ -56,6 +69,8 @@ export async function submitInquiry(
 export async function submitContact(
   input: ContactInput
 ): Promise<InquiryResult> {
+  if (input.trap && input.trap.trim() !== "") return { ok: true };
+
   const name = input.name.trim().slice(0, 100);
   const phone = input.phone.trim().slice(0, 30);
   const message = input.message.trim().slice(0, 2000);
@@ -74,7 +89,7 @@ export async function submitContact(
 
   if (error) {
     console.error("Could not save contact message:", error.message);
-    return { ok: false, error: GENERIC_ERROR };
+    return { ok: false, error: failureMessage(error) };
   }
 
   return { ok: true };

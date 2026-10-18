@@ -45,6 +45,7 @@ export function InquiryForm({
       message,
       propertyId,
       propertyTitle,
+      trap: String(data.get("site_notes") ?? ""),
     });
 
     if (result.ok) {
@@ -69,6 +70,15 @@ export function InquiryForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-3">
+      <div
+        aria-hidden="true"
+        className="absolute -left-[9999px] h-0 w-0 overflow-hidden"
+      >
+        <label>
+          Site notes
+          <input name="site_notes" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
       <p className="font-semibold">Send an inquiry</p>
 
       <div>

@@ -35,7 +35,13 @@ export function ContactForm() {
     setStatus("sending");
     setServerError(null);
 
-    const result = await submitContact({ name, phone, email, message });
+    const result = await submitContact({
+      name,
+      phone,
+      email,
+      message,
+      trap: String(data.get("site_notes") ?? ""),
+    });
 
     if (result.ok) {
       setStatus("sent");
