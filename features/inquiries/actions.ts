@@ -4,6 +4,7 @@ import { getSupabase } from "@/lib/supabase/client";
 import { after } from "next/server";
 
 import { sendLeadAlert } from "@/lib/notifications";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export type InquiryInput = {
   name: string;
@@ -12,6 +13,7 @@ export type InquiryInput = {
   propertyId: string;
   propertyTitle: string;
   trap?: string;
+  turnstileToken?: string;
 };
 
 export type ContactInput = {
@@ -20,6 +22,7 @@ export type ContactInput = {
   email: string;
   message: string;
   trap?: string;
+  turnstileToken?: string;
 };
 
 export type InquiryResult = { ok: true } | { ok: false; error: string };
@@ -50,6 +53,13 @@ export async function submitInquiry(
 
   if (name.length < 2 || !isValidPhone(phone)) {
     return { ok: false, error: "Please check your name and phone number." };
+  }
+
+  if (!(await verifyTurnstile(input.turnstileToken))) {
+    return {
+      ok: false,
+      error: "The security check failed. Please try again.",
+    };
   }
 
   const { error } = await getSupabase().from("leads").insert({
@@ -90,6 +100,13 @@ export async function submitContact(
 
   if (name.length < 2 || !isValidPhone(phone) || message.length < 5) {
     return { ok: false, error: "Please check your details and message." };
+  }
+
+  if (!(await verifyTurnstile(input.turnstileToken))) {
+    return {
+      ok: false,
+      error: "The security check failed. Please try again.",
+    };
   }
 
   const { error } = await getSupabase().from("leads").insert({

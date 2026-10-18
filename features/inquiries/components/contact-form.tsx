@@ -4,6 +4,11 @@ import { useState } from "react";
 
 import { submitContact } from "../actions";
 
+import {
+  TurnstileWidget,
+  resetTurnstile,
+} from "@/components/security/turnstile-widget";
+
 type Errors = { name?: string; phone?: string; message?: string };
 
 const fieldClass =
@@ -32,6 +37,12 @@ export function ContactForm() {
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
+    const turnstileToken = String(data.get("cf-turnstile-response") ?? "");
+    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !turnstileToken) {
+      setServerError("Please wait for the security check to finish, then try again.");
+      return;
+    }
+
     setStatus("sending");
     setServerError(null);
 
@@ -41,7 +52,10 @@ export function ContactForm() {
       email,
       message,
       trap: String(data.get("site_notes") ?? ""),
+      turnstileToken,
     });
+
+    resetTurnstile();
 
     if (result.ok) {
       setStatus("sent");
@@ -110,6 +124,8 @@ export function ContactForm() {
       </div>
 
       {serverError && <p className="text-sm text-red-500">{serverError}</p>}
+
+      <TurnstileWidget />
 
       <button
         type="submit"
