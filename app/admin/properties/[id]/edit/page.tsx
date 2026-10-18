@@ -7,6 +7,7 @@ import { updateProperty } from "@/features/properties/actions";
 import { PropertyForm } from "@/features/properties/components/property-form";
 import { getPropertyForEdit } from "@/features/properties/services/property-admin.service";
 import { toFormValues } from "@/features/properties/validation";
+import { PropertyImages } from "@/features/properties/components/property-images";
 
 export default async function EditPropertyPage({
   params,
@@ -30,6 +31,11 @@ export default async function EditPropertyPage({
       </Link>
 
       <h1 className="mb-8 text-3xl font-bold">Edit property</h1>
+
+      <section className="mb-10">
+        <h2 className="mb-3 text-xl font-semibold">Photos</h2>
+        <PropertyImages propertyId={property.id} initialImages={property.images} />
+      </section>
 
       <PropertyForm
         initial={toFormValues(property)}

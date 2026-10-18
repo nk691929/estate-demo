@@ -1,18 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, Bath, Bed, MapPin, Phone, Ruler } from "lucide-react";
 
+import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site";
-import { formatPrice, formatSize } from "@/lib/format";
+import { InquiryForm } from "@/features/inquiries/components/inquiry-form";
+import { PropertyGallery } from "@/features/properties/components/property-gallery";
 import {
   getAllPropertySlugs,
   getPropertyBySlug,
 } from "@/features/properties/services/property.service";
-import { InquiryForm } from "@/features/inquiries/components/inquiry-form";
-import { JsonLd } from "@/components/seo/json-ld";
-
+import { formatPrice, formatSize } from "@/lib/format";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,10 +39,10 @@ export default async function PropertyPage({ params }: Props) {
 
   if (!property) notFound();
 
-  const [mainImage, ...otherImages] = property.images;
   const whatsappText = encodeURIComponent(
     `Hello, I am interested in: ${property.title}`
   );
+
   const toAbsolute = (src: string) =>
     src.startsWith("http") ? src : `${siteConfig.url}${src}`;
 
@@ -79,6 +78,7 @@ export default async function PropertyPage({ params }: Props) {
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <JsonLd data={jsonLd} />
+
       <Link
         href="/properties"
         className="mb-6 inline-flex items-center gap-2 text-sm text-foreground/70 hover:text-foreground"
@@ -87,32 +87,7 @@ export default async function PropertyPage({ params }: Props) {
         Back to properties
       </Link>
 
-      <div className="grid gap-3 md:h-[420px] md:grid-cols-3">
-        <div className="relative h-64 overflow-hidden rounded-2xl md:col-span-2 md:row-span-2 md:h-auto">
-          <Image
-            src={mainImage}
-            alt={property.title}
-            fill
-            priority
-            sizes="(min-width: 768px) 66vw, 100vw"
-            className="object-cover"
-          />
-        </div>
-        {otherImages.slice(0, 2).map((image, index) => (
-          <div
-            key={image}
-            className="relative hidden overflow-hidden rounded-2xl md:block"
-          >
-            <Image
-              src={image}
-              alt={`${property.title} photo ${index + 2}`}
-              fill
-              sizes="33vw"
-              className="object-cover"
-            />
-          </div>
-        ))}
-      </div>
+      <PropertyGallery images={property.images} title={property.title} />
 
       <div className="mt-8 grid gap-10 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
