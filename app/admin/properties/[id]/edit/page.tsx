@@ -9,6 +9,7 @@ import { PropertyImages } from "@/features/properties/components/property-images
 import { PublishToggle } from "@/features/properties/components/publish-toggle";
 import { getPropertyForEdit } from "@/features/properties/services/property-admin.service";
 import { toFormValues } from "@/features/properties/validation";
+import { DeletePropertyButton } from "@/features/properties/components/delete-property-button";
 
 export default async function EditPropertyPage({
   params,
@@ -47,6 +48,11 @@ export default async function EditPropertyPage({
         action={updateProperty.bind(null, property.id)}
         submitLabel="Save changes"
       />
+
+      <section className="mt-12 border-t border-foreground/10 pt-8">
+        <h2 className="mb-3 text-xl font-semibold">Danger zone</h2>
+        <DeletePropertyButton propertyId={property.id} title={property.title} />
+      </section>
     </main>
   );
 }

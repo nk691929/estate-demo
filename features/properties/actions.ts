@@ -162,3 +162,43 @@ export async function setPublished(
 
   return { ok: true };
 }
+
+const PHOTO_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/`;
+
+export async function deleteProperty(id: string): Promise<SaveResult> {
+  const supabase = await createAuthClient();
+  const { data: auth } = await supabase.auth.getClaims();
+
+  if (!auth?.claims) {
+    return { ok: false, error: "Please sign in again." };
+  }
+
+  const { data, error } = await supabase
+    .from("properties")
+    .delete()
+    .eq("id", id)
+    .select("slug, images");
+
+  if (error || !data || data.length === 0) {
+    return { ok: false, error: "Could not delete the property." };
+  }
+
+  const paths = (data[0].images as string[])
+    .filter((src) => src.startsWith(PHOTO_PREFIX))
+    .map((src) => decodeURIComponent(src.slice(PHOTO_PREFIX.length)));
+
+  if (paths.length > 0) {
+    const { data: removed, error: removeError } = await supabase.storage
+      .from("property-images")
+      .remove(paths);
+
+    if (removeError || (removed?.length ?? 0) !== paths.length) {
+      console.error("Some photos could not be removed from storage.");
+    }
+  }
+
+  updateTag("properties");
+  updateTag(`property-${data[0].slug}`);
+
+  return { ok: true };
+}

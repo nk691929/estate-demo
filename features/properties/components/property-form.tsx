@@ -69,6 +69,8 @@ export function PropertyForm({
 
     if (result.ok) {
       if (result.redirectTo) {
+        setValues(initial);
+        setState("idle");
         router.push(result.redirectTo);
         return;
       }

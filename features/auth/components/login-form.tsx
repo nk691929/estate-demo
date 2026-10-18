@@ -18,7 +18,8 @@ export function LoginForm() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     setSending(true);
     setError(null);
 
@@ -28,6 +29,8 @@ export function LoginForm() {
     });
 
     if (result.ok) {
+      form.reset();
+      setSending(false);
       router.replace("/admin");
       return;
     }
