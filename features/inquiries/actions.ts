@@ -1,6 +1,9 @@
 "use server";
 
 import { getSupabase } from "@/lib/supabase/client";
+import { after } from "next/server";
+
+import { sendLeadAlert } from "@/lib/notifications";
 
 export type InquiryInput = {
   name: string;
@@ -63,6 +66,16 @@ export async function submitInquiry(
     return { ok: false, error: failureMessage(error) };
   }
 
+  after(() =>
+    sendLeadAlert({
+      name,
+      phone,
+      message: input.message,
+      propertyTitle: input.propertyTitle,
+      source: "property",
+    })
+  );
+
   return { ok: true };
 }
 
@@ -91,6 +104,16 @@ export async function submitContact(
     console.error("Could not save contact message:", error.message);
     return { ok: false, error: failureMessage(error) };
   }
+
+  after(() =>
+    sendLeadAlert({
+      name,
+      phone,
+      email: input.email,
+      message,
+      source: "contact",
+    })
+  );
 
   return { ok: true };
 }
