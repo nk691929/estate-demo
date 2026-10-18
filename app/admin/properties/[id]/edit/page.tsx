@@ -5,9 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import { requireAdmin } from "@/features/auth/require-admin";
 import { updateProperty } from "@/features/properties/actions";
 import { PropertyForm } from "@/features/properties/components/property-form";
+import { PropertyImages } from "@/features/properties/components/property-images";
+import { PublishToggle } from "@/features/properties/components/publish-toggle";
 import { getPropertyForEdit } from "@/features/properties/services/property-admin.service";
 import { toFormValues } from "@/features/properties/validation";
-import { PropertyImages } from "@/features/properties/components/property-images";
 
 export default async function EditPropertyPage({
   params,
@@ -30,7 +31,11 @@ export default async function EditPropertyPage({
         All properties
       </Link>
 
-      <h1 className="mb-8 text-3xl font-bold">Edit property</h1>
+      <h1 className="mb-6 text-3xl font-bold">Edit property</h1>
+
+      <div className="mb-10">
+        <PublishToggle propertyId={property.id} published={property.published} />
+      </div>
 
       <section className="mb-10">
         <h2 className="mb-3 text-xl font-semibold">Photos</h2>

@@ -3,8 +3,11 @@
 import { useState } from "react";
 
 import type { PropertyFormValues } from "../validation";
+import { useRouter } from "next/navigation";
 
-type SaveResult = { ok: true } | { ok: false; error: string };
+type SaveResult =
+  | { ok: true; redirectTo?: string }
+  | { ok: false; error: string };
 
 const inputClass =
   "h-11 w-full rounded-lg border border-foreground/20 bg-background px-3 text-sm outline-none focus:border-foreground";
@@ -33,6 +36,7 @@ export function PropertyForm({
   action: (values: PropertyFormValues) => Promise<SaveResult>;
   submitLabel: string;
 }) {
+  const router = useRouter();
   const [values, setValues] = useState<PropertyFormValues>(initial);
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">(
     "idle"
@@ -64,6 +68,10 @@ export function PropertyForm({
     const result = await action(values);
 
     if (result.ok) {
+      if (result.redirectTo) {
+        router.push(result.redirectTo);
+        return;
+      }
       setState("saved");
     } else {
       setState("error");

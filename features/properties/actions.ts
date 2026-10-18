@@ -4,6 +4,7 @@ import { updateTag } from "next/cache";
 
 import { createAuthClient } from "@/lib/supabase/server";
 import { parsePropertyForm, type PropertyFormValues } from "./validation";
+import { slugify } from "@/lib/slug";
 
 export type SaveResult = { ok: true } | { ok: false; error: string };
 
@@ -75,6 +76,85 @@ export async function updatePropertyImages(
 
   if (error || !data || data.length === 0) {
     return { ok: false, error: "Could not save photos." };
+  }
+
+  updateTag("properties");
+  updateTag(`property-${data[0].slug}`);
+
+  return { ok: true };
+}
+
+export type CreateResult =
+  | { ok: true; redirectTo: string }
+  | { ok: false; error: string };
+
+export async function createProperty(
+  values: PropertyFormValues
+): Promise<CreateResult> {
+  const parsed = parsePropertyForm(values);
+  if (!parsed.ok) return parsed;
+
+  const supabase = await createAuthClient();
+  const { data: auth } = await supabase.auth.getClaims();
+
+  if (!auth?.claims) {
+    return { ok: false, error: "Please sign in again." };
+  }
+
+  const base = slugify(parsed.data.title) || "property";
+
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const slug =
+      attempt === 0 ? base : `${base}-${crypto.randomUUID().slice(0, 4)}`;
+
+    const { data, error } = await supabase
+      .from("properties")
+      .insert({ ...parsed.data, slug, images: [], published: false })
+      .select("id")
+      .single();
+
+    if (!error && data) {
+      return { ok: true, redirectTo: `/admin/properties/${data.id}/edit` };
+    }
+
+    // 23505 = the slug already exists, so try again with a short random ending
+    if (error?.code !== "23505") break;
+  }
+
+  return { ok: false, error: "Could not create the property." };
+}
+
+export async function setPublished(
+  id: string,
+  published: boolean
+): Promise<SaveResult> {
+  const supabase = await createAuthClient();
+  const { data: auth } = await supabase.auth.getClaims();
+
+  if (!auth?.claims) {
+    return { ok: false, error: "Please sign in again." };
+  }
+
+  if (published) {
+    const { data: current } = await supabase
+      .from("properties")
+      .select("images")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (!current || !Array.isArray(current.images) || current.images.length < 1) {
+      return { ok: false, error: "Add at least one photo before publishing." };
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("properties")
+    .update({ published })
+    .eq("id", id)
+    .select("slug");
+
+  if (error || !data || data.length === 0) {
+    return { ok: false, error: "Could not change visibility." };
   }
 
   updateTag("properties");
