@@ -1,9 +1,9 @@
 "use server";
 
-import { getSupabase } from "@/lib/supabase/client";
 import { after } from "next/server";
 
 import { sendLeadAlert } from "@/lib/notifications";
+import { getAdminSupabase } from "@/lib/supabase/admin";
 import { verifyTurnstile } from "@/lib/turnstile";
 
 export type InquiryInput = {
@@ -42,10 +42,20 @@ function failureMessage(error: { message: string }) {
     : GENERIC_ERROR;
 }
 
+async function insertLead(row: Record<string, unknown>) {
+  try {
+    const { error } = await getAdminSupabase().from("leads").insert(row);
+    return error;
+  } catch (caught) {
+    return {
+      message: caught instanceof Error ? caught.message : "Unknown error",
+    };
+  }
+}
+
 export async function submitInquiry(
   input: InquiryInput
 ): Promise<InquiryResult> {
-  // A real person never sees or fills the hidden field. Pretend it worked.
   if (input.trap && input.trap.trim() !== "") return { ok: true };
 
   const name = input.name.trim().slice(0, 100);
@@ -56,13 +66,10 @@ export async function submitInquiry(
   }
 
   if (!(await verifyTurnstile(input.turnstileToken))) {
-    return {
-      ok: false,
-      error: "The security check failed. Please try again.",
-    };
+    return { ok: false, error: "The security check failed. Please try again." };
   }
 
-  const { error } = await getSupabase().from("leads").insert({
+  const error = await insertLead({
     name,
     phone,
     message: input.message.trim().slice(0, 2000),
@@ -103,13 +110,10 @@ export async function submitContact(
   }
 
   if (!(await verifyTurnstile(input.turnstileToken))) {
-    return {
-      ok: false,
-      error: "The security check failed. Please try again.",
-    };
+    return { ok: false, error: "The security check failed. Please try again." };
   }
 
-  const { error } = await getSupabase().from("leads").insert({
+  const error = await insertLead({
     name,
     phone,
     email: input.email.trim().slice(0, 200) || null,
