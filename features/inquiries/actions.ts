@@ -5,13 +5,13 @@ import { after } from "next/server";
 import { sendLeadAlert } from "@/lib/notifications";
 import { getAdminSupabase } from "@/lib/supabase/admin";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { getSupabase } from "@/lib/supabase/client";
 
 export type InquiryInput = {
   name: string;
   phone: string;
   message: string;
   propertyId: string;
-  propertyTitle: string;
   trap?: string;
   turnstileToken?: string;
 };
@@ -69,13 +69,34 @@ export async function submitInquiry(
     return { ok: false, error: "The security check failed. Please try again." };
   }
 
+  // The browser only tells us which property. The server decides what its title is.
+  const lookup = await getSupabase()
+    .from("properties")
+    .select("id, title")
+    .eq("id", String(input.propertyId).slice(0, 64))
+    .maybeSingle();
+
+  if (lookup.error) {
+    console.error("Could not look up property:", lookup.error.message);
+    return { ok: false, error: GENERIC_ERROR };
+  }
+
+  if (!lookup.data) {
+    return {
+      ok: false,
+      error: "This property is no longer available. Please contact us on WhatsApp.",
+    };
+  }
+
+  const property = lookup.data as { id: string; title: string };
+
   const error = await insertLead({
     name,
     phone,
     message: input.message.trim().slice(0, 2000),
     source: "property",
-    property_id: input.propertyId,
-    property_title: input.propertyTitle,
+    property_id: property.id,
+    property_title: property.title,
   });
 
   if (error) {
@@ -88,7 +109,7 @@ export async function submitInquiry(
       name,
       phone,
       message: input.message,
-      propertyTitle: input.propertyTitle,
+      propertyTitle: property.title,
       source: "property",
     })
   );

@@ -55,7 +55,6 @@ export function InquiryForm({
       phone,
       message,
       propertyId,
-      propertyTitle,
       trap: String(data.get("site_notes") ?? ""),
       turnstileToken,
     });
