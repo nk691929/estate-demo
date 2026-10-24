@@ -20,4 +20,5 @@ export interface Lead {
   status: LeadStatus;
   createdAt: string;
   notes: string;
+  archived: boolean;
 }

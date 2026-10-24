@@ -46,3 +46,28 @@ export async function updateLead(input: {
   revalidatePath("/admin/leads");
   return { ok: true };
 }
+
+export async function setLeadArchived(
+  id: string,
+  archived: boolean
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createAuthClient();
+  const { data: auth } = await supabase.auth.getClaims();
+
+  if (!auth?.claims) {
+    return { ok: false, error: "Please sign in again." };
+  }
+
+  const { data, error } = await supabase
+    .from("leads")
+    .update({ archived })
+    .eq("id", id)
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return { ok: false, error: "Could not update the lead." };
+  }
+
+  revalidatePath("/admin/leads");
+  return { ok: true };
+}
