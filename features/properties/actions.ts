@@ -68,6 +68,12 @@ export async function updatePropertyImages(
     return { ok: false, error: "Please sign in again." };
   }
 
+  const { data: before } = await supabase
+    .from("properties")
+    .select("images")
+    .eq("id", id)
+    .maybeSingle();
+
   const { data, error } = await supabase
     .from("properties")
     .update({ images })
@@ -77,6 +83,11 @@ export async function updatePropertyImages(
   if (error || !data || data.length === 0) {
     return { ok: false, error: "Could not save photos." };
   }
+
+  const removed = ((before?.images as string[] | undefined) ?? []).filter(
+    (src) => !images.includes(src)
+  );
+  await removeStoredPhotos(supabase, id, removed);
 
   updateTag("properties");
   updateTag(`property-${data[0].slug}`);
@@ -165,6 +176,27 @@ export async function setPublished(
 
 const PHOTO_PREFIX = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/property-images/`;
 
+async function removeStoredPhotos(
+  supabase: Awaited<ReturnType<typeof createAuthClient>>,
+  propertyId: string,
+  sources: string[]
+) {
+  const paths = sources
+    .filter((src) => src.startsWith(PHOTO_PREFIX))
+    .map((src) => decodeURIComponent(src.slice(PHOTO_PREFIX.length)))
+    .filter((path) => path.startsWith(`${propertyId}/`) && !path.includes(".."));
+
+  if (paths.length === 0) return;
+
+  const { data, error } = await supabase.storage
+    .from("property-images")
+    .remove(paths);
+
+  if (error || (data?.length ?? 0) !== paths.length) {
+    console.error("Some photos could not be deleted from storage.");
+  }
+}
+
 export async function deleteProperty(id: string): Promise<SaveResult> {
   const supabase = await createAuthClient();
   const { data: auth } = await supabase.auth.getClaims();
@@ -183,19 +215,7 @@ export async function deleteProperty(id: string): Promise<SaveResult> {
     return { ok: false, error: "Could not delete the property." };
   }
 
-  const paths = (data[0].images as string[])
-    .filter((src) => src.startsWith(PHOTO_PREFIX))
-    .map((src) => decodeURIComponent(src.slice(PHOTO_PREFIX.length)));
-
-  if (paths.length > 0) {
-    const { data: removed, error: removeError } = await supabase.storage
-      .from("property-images")
-      .remove(paths);
-
-    if (removeError || (removed?.length ?? 0) !== paths.length) {
-      console.error("Some photos could not be removed from storage.");
-    }
-  }
+  await removeStoredPhotos(supabase, id, data[0].images as string[]);
 
   updateTag("properties");
   updateTag(`property-${data[0].slug}`);

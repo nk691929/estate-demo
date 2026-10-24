@@ -104,6 +104,7 @@ export function PropertyImages({
   }
 
   async function remove(src: string) {
+    if (!window.confirm("Remove this photo permanently?")) return;
     setBusy(true);
     setMessage(null);
     await persist(images.filter((item) => item !== src));
