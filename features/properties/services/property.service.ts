@@ -141,3 +141,61 @@ export async function getAllPropertySlugs(): Promise<string[]> {
 
   return (data as { slug: string }[]).map((row) => row.slug);
 }
+
+export type PropertySummary = {
+  total: number;
+  forSale: number;
+  forRent: number;
+  areas: number;
+  byType: Record<PropertyType, { count: number; cover?: string }>;
+};
+
+export async function getPropertySummary(): Promise<PropertySummary> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("properties");
+
+  const { data, error } = await getSupabase()
+    .from("properties")
+    .select("purpose, type, area, images")
+    .order("created_at", { ascending: false })
+    .order("id");
+
+  if (error) throw new Error(`Could not summarise properties: ${error.message}`);
+
+  const summary: PropertySummary = {
+    total: 0,
+    forSale: 0,
+    forRent: 0,
+    areas: 0,
+    byType: {
+      house: { count: 0 },
+      apartment: { count: 0 },
+      plot: { count: 0 },
+      commercial: { count: 0 },
+    },
+  };
+
+  const areas = new Set<string>();
+
+  for (const row of data as {
+    purpose: PropertyPurpose;
+    type: PropertyType;
+    area: string;
+    images: string[];
+  }[]) {
+    summary.total += 1;
+    if (row.purpose === "sale") summary.forSale += 1;
+    else summary.forRent += 1;
+
+    areas.add(row.area.trim().toLowerCase());
+
+    const entry = summary.byType[row.type];
+    entry.count += 1;
+    if (!entry.cover && row.images[0]) entry.cover = row.images[0];
+  }
+
+  summary.areas = areas.size;
+
+  return summary;
+}

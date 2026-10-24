@@ -1,17 +1,28 @@
 import Link from "next/link";
 
+import { BrowseByType } from "@/features/home/components/browse-by-type";
 import { HeroSection } from "@/features/home/components/hero-section";
+import { HowItWorks } from "@/features/home/components/how-it-works";
+import { StatsStrip } from "@/features/home/components/stats-strip";
 import { PropertyCard } from "@/features/properties/components/property-card";
-import { getFeaturedProperties } from "@/features/properties/services/property.service";
+import {
+  getFeaturedProperties,
+  getPropertySummary,
+} from "@/features/properties/services/property.service";
 
 export default async function Home() {
-  const featured = await getFeaturedProperties();
+  const [featured, summary] = await Promise.all([
+    getFeaturedProperties(),
+    getPropertySummary(),
+  ]);
 
   return (
     <main>
       <HeroSection />
 
-      <section className="mx-auto max-w-6xl px-4 py-16">
+      <BrowseByType summary={summary} />
+
+      <section className="mx-auto max-w-6xl px-4 pb-16">
         <div className="mb-8 flex items-end justify-between">
           <div>
             <h2 className="text-3xl font-bold">Featured properties</h2>
@@ -33,6 +44,10 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      <StatsStrip summary={summary} />
+
+      <HowItWorks />
     </main>
   );
 }
