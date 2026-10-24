@@ -123,7 +123,7 @@ export function InquiryForm({
 
       {serverError && <p className="text-xs text-red-500">{serverError}</p>}
 
-      <TurnstileWidget />
+      <TurnstileWidget whatsappText={`Hello, I am interested in: ${propertyTitle}`} />
 
       <button
         type="submit"
