@@ -9,7 +9,12 @@ import {
   Plus,
 } from "lucide-react";
 
+import { ChartCard } from "@/features/admin/components/charts/chart-card";
+import { LeadsOverTime } from "@/features/admin/components/charts/leads-over-time";
+import { PipelineChart } from "@/features/admin/components/charts/pipeline-chart";
+import { SourceDonut } from "@/features/admin/components/charts/source-donut";
 import { StatCard } from "@/features/admin/components/stat-card";
+import { getChartData } from "@/features/admin/services/chart.service";
 import { getDashboardStats } from "@/features/admin/services/dashboard.service";
 import { requireAdmin } from "@/features/auth/require-admin";
 import { statusStyles } from "@/features/leads/status-styles";
@@ -27,14 +32,27 @@ const leadDateFormat = new Intl.DateTimeFormat("en-GB", {
 
 export default async function AdminPage() {
   const { supabase } = await requireAdmin();
-  const stats = await getDashboardStats(supabase);
+
+  const [stats, charts] = await Promise.all([
+    getDashboardStats(supabase),
+    getChartData(supabase),
+  ]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:py-10">
-      <h1 className="text-3xl font-bold">Welcome back</h1>
-      <p className="mb-8 mt-1 text-foreground/60">
-        {dayFormat.format(new Date())}
-      </p>
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold">Welcome back</h1>
+          <p className="mt-1 text-foreground/60">{dayFormat.format(new Date())}</p>
+        </div>
+        <Link
+          href="/admin/properties/new"
+          className="flex items-center gap-2 rounded-lg bg-foreground px-4 py-3 text-sm font-medium text-background transition hover:opacity-80"
+        >
+          <Plus className="size-4" />
+          Add a property
+        </Link>
+      </div>
 
       {stats.waitingOver24h > 0 && (
         <Link
@@ -87,7 +105,21 @@ export default async function AdminPage() {
         />
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
+        <ChartCard
+          title="Leads per day"
+          subtitle="Last 30 days, Pakistan time. Archived leads are not counted."
+          className="lg:col-span-2"
+        >
+          <LeadsOverTime days={charts.days} />
+        </ChartCard>
+
+        <ChartCard title="Lead sources" subtitle="Where active leads come from">
+          <SourceDonut items={charts.sources} />
+        </ChartCard>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <section className="rounded-2xl border border-foreground/10 p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg font-semibold">Recent leads</h2>
@@ -132,32 +164,9 @@ export default async function AdminPage() {
           )}
         </section>
 
-        <section className="rounded-2xl border border-foreground/10 p-5">
-          <h2 className="mb-4 text-lg font-semibold">Quick actions</h2>
-          <div className="space-y-2 text-sm">
-            <Link
-              href="/admin/properties/new"
-              className="flex items-center gap-2 rounded-lg bg-foreground px-4 py-3 font-medium text-background transition hover:opacity-80"
-            >
-              <Plus className="size-4" />
-              Add a property
-            </Link>
-            <Link
-              href="/admin/leads?status=new"
-              className="flex items-center gap-2 rounded-lg border border-foreground/20 px-4 py-3 transition hover:bg-foreground/5"
-            >
-              <Inbox className="size-4" />
-              Review new leads
-            </Link>
-            <Link
-              href="/admin/properties"
-              className="flex items-center gap-2 rounded-lg border border-foreground/20 px-4 py-3 transition hover:bg-foreground/5"
-            >
-              <Building2 className="size-4" />
-              Manage properties
-            </Link>
-          </div>
-        </section>
+        <ChartCard title="Pipeline" subtitle="Active leads by stage">
+          <PipelineChart items={charts.pipeline} />
+        </ChartCard>
       </div>
     </main>
   );

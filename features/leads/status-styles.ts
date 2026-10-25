@@ -8,3 +8,13 @@ export const statusStyles: Record<LeadStatus, string> = {
   won: "bg-green-500/15 text-green-400",
   lost: "bg-foreground/10 text-foreground/60",
 };
+
+
+export const statusBars: Record<LeadStatus, string> = {
+  new: "bg-blue-500",
+  contacted: "bg-yellow-500",
+  viewing: "bg-purple-500",
+  negotiating: "bg-orange-500",
+  won: "bg-green-500",
+  lost: "bg-foreground/40",
+};
