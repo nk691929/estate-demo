@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -7,6 +8,9 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site";
 import { InquiryForm } from "@/features/inquiries/components/inquiry-form";
 import { PropertyGallery } from "@/features/properties/components/property-gallery";
+import { PropertyMap } from "@/features/properties/components/property-map";
+import { ShareButtons } from "@/features/properties/components/share-buttons";
+import { SimilarProperties } from "@/features/properties/components/similar-properties";
 import {
   getAllPropertySlugs,
   getPropertyBySlug,
@@ -39,6 +43,8 @@ export default async function PropertyPage({ params }: Props) {
 
   if (!property) notFound();
 
+  const pageUrl = `${siteConfig.url}/properties/${property.slug}`;
+
   const whatsappText = encodeURIComponent(
     `Hello, I am interested in: ${property.title}`
   );
@@ -51,7 +57,7 @@ export default async function PropertyPage({ params }: Props) {
     "@type": "RealEstateListing",
     name: property.title,
     description: property.description,
-    url: `${siteConfig.url}/properties/${property.slug}`,
+    url: pageUrl,
     image: property.images.map(toAbsolute),
     offers: {
       "@type": "Offer",
@@ -100,6 +106,7 @@ export default async function PropertyPage({ params }: Props) {
               <MapPin className="size-4" />
               {property.address}
             </p>
+            <ShareButtons url={pageUrl} title={property.title} />
           </div>
 
           <div className="flex flex-wrap gap-6 rounded-2xl border border-foreground/10 p-5">
@@ -128,19 +135,27 @@ export default async function PropertyPage({ params }: Props) {
             </p>
           </section>
 
-          <section>
-            <h2 className="mb-3 text-xl font-semibold">Features</h2>
-            <ul className="flex flex-wrap gap-2">
-              {property.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="rounded-full border border-foreground/15 px-4 py-1.5 text-sm"
-                >
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </section>
+          {property.features.length > 0 && (
+            <section>
+              <h2 className="mb-3 text-xl font-semibold">Features</h2>
+              <ul className="flex flex-wrap gap-2">
+                {property.features.map((feature) => (
+                  <li
+                    key={feature}
+                    className="rounded-full border border-foreground/15 px-4 py-1.5 text-sm"
+                  >
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <PropertyMap
+            latitude={property.latitude}
+            longitude={property.longitude}
+            address={property.address}
+          />
         </div>
 
         <aside className="h-fit space-y-4 rounded-2xl border border-foreground/10 p-6 lg:sticky lg:top-24">
@@ -164,10 +179,17 @@ export default async function PropertyPage({ params }: Props) {
           </a>
 
           <div className="border-t border-foreground/10 pt-4">
-            <InquiryForm propertyId={property.id} propertyTitle={property.title} />
+            <InquiryForm
+              propertyId={property.id}
+              propertyTitle={property.title}
+            />
           </div>
         </aside>
       </div>
+
+      <Suspense fallback={null}>
+        <SimilarProperties property={property} />
+      </Suspense>
     </main>
   );
 }

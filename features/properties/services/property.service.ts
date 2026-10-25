@@ -291,3 +291,57 @@ export async function searchProperties(
     totalPages: Math.max(1, Math.ceil(total / PROPERTY_PAGE_SIZE)),
   };
 }
+
+export async function getSimilarProperties(
+  base: {
+    id: string;
+    purpose: PropertyPurpose;
+    type: PropertyType;
+    city: string;
+    area: string;
+    price: number;
+  },
+  limit = 3
+): Promise<Property[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("properties");
+
+  const safeCity = base.city.replace(/[\\%_]/g, "\\$&");
+
+
+  const { data, error } = await getSupabase()
+    .from("properties")
+    .select("*")
+    .eq("purpose", base.purpose)
+    .ilike("city", safeCity)
+    .neq("id", base.id)
+    .order("created_at", { ascending: false })
+    .order("id")
+    .limit(30);
+
+  if (error) {
+    throw new Error(`Could not load similar properties: ${error.message}`);
+  }
+
+  const baseArea = base.area.trim().toLowerCase();
+
+  return (data as PropertyRow[])
+    .map(toProperty)
+    .map((candidate, index) => {
+      let score = 0;
+
+      if (candidate.type === base.type) score += 4;
+      if (candidate.area.trim().toLowerCase() === baseArea) score += 2;
+
+      const ratio = base.price > 0 ? candidate.price / base.price : 0;
+      if (ratio >= 0.7 && ratio <= 1.4) score += 3;
+      else if (ratio >= 0.4 && ratio <= 2.5) score += 1;
+
+      return { candidate, score, index };
+    })
+    .filter((item) => item.score >= 3)
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, limit)
+    .map((item) => item.candidate);
+}
