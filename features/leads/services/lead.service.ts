@@ -37,14 +37,14 @@ function toLead(row: LeadRow): Lead {
 
 export async function getLeads(
   supabase: AuthClient,
-  options: { archived: boolean; status?: LeadStatus }
+  options: { archived: boolean; status?: LeadStatus; limit?: number }
 ): Promise<Lead[]> {
   let query = supabase
     .from("leads")
     .select("*")
     .eq("archived", options.archived)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(options.limit ?? 200);
 
   if (options.status) query = query.eq("status", options.status);
 
