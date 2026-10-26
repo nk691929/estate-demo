@@ -52,13 +52,27 @@ export default async function Home() {
         </div>
       </section>
 
-      <WhyChooseUs />
-      <StatsStrip summary={summary} />
-      <HowItWorks />
-      <AgentsPreview agents={agents} />
-      <Testimonials />
-      <Faq />
-      <CtaBanner />
+      <div className="reveal">
+        <WhyChooseUs />
+      </div>
+      <div className="reveal">
+        <StatsStrip summary={summary} />
+      </div>
+      <div className="reveal">
+        <HowItWorks />
+      </div>
+      <div className="reveal">
+        <AgentsPreview agents={agents} />
+      </div>
+      <div className="reveal">
+        <Testimonials />
+      </div>
+      <div className="reveal">
+        <Faq />
+      </div>
+      <div className="reveal">
+        <CtaBanner />
+      </div>
     </main>
   );
 }

@@ -51,9 +51,10 @@ export function PropertyMap({
         <iframe
           title={`Map showing ${address}`}
           src={src}
+          sandbox="allow-scripts allow-same-origin"
           loading="lazy"
-          className="h-72 w-full border-0 sm:h-80"
           referrerPolicy="strict-origin-when-cross-origin"
+          className="h-72 w-full border-0 sm:h-80"
         />
       </div>
 
