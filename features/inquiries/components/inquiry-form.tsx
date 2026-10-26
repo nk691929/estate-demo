@@ -97,7 +97,7 @@ export function InquiryForm({
       <div>
         <input name="name" placeholder="Your name" className={fieldClass} />
         {errors.name && (
-          <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+          <p role="alert" className="mt-1 text-xs text-red-500">{errors.name}</p>
         )}
       </div>
 
@@ -108,8 +108,8 @@ export function InquiryForm({
           placeholder="Phone number"
           className={fieldClass}
         />
-        {errors.phone && (
-          <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+        {errors.name && (
+          <p role="alert" className="mt-1 text-xs text-red-500">{errors.name}</p>
         )}
       </div>
 
@@ -120,7 +120,9 @@ export function InquiryForm({
         className="w-full rounded-lg border border-foreground/20 bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
       />
 
-      {serverError && <p className="text-xs text-red-500">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="mt-1 text-xs text-red-500">{serverError}</p>
+      )}
 
       <TurnstileWidget whatsappText={`Hello, I am interested in: ${propertyTitle}`} />
 

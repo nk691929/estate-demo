@@ -7,6 +7,7 @@ import type { RawSearchParams } from "@/features/properties/search-params";
 export const metadata: Metadata = {
   title: "Properties for sale and rent",
   description: "Browse houses, apartments, plots and commercial properties.",
+  alternates: { canonical: "/properties" },
 };
 
 function ListingSkeleton() {

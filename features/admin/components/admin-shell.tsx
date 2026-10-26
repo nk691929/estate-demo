@@ -73,13 +73,11 @@ function SidebarContent({
               title={collapsed ? label : undefined}
               aria-label={collapsed ? label : undefined}
               aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${
-                collapsed ? "justify-center" : ""
-              } ${
-                active
+              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition ${collapsed ? "justify-center" : ""
+                } ${active
                   ? "bg-foreground text-background"
                   : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
-              }`}
+                }`}
             >
               <Icon className="size-5 shrink-0" />
               {!collapsed && label}
@@ -187,10 +185,15 @@ export function AdminShell({
 
   return (
     <div className="flex flex-1 flex-col lg:flex-row">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-foreground focus:px-4 focus:py-2 focus:text-background"
+      >
+        Skip to content
+      </a>
       <aside
-        className={`hidden shrink-0 border-r border-foreground/10 bg-foreground/[0.03] transition-[width] duration-200 lg:sticky lg:top-0 lg:block lg:h-screen ${
-          collapsed ? "lg:w-[72px]" : "lg:w-64"
-        }`}
+        className={`hidden shrink-0 border-r border-foreground/10 bg-foreground/[0.03] transition-[width] duration-200 lg:sticky lg:top-0 lg:block lg:h-screen ${collapsed ? "lg:w-[72px]" : "lg:w-64"
+          }`}
       >
         <SidebarContent
           brand={brand}
@@ -245,7 +248,9 @@ export function AdminShell({
         </div>
       )}
 
-      <div className="min-w-0 flex-1">{children}</div>
+      <div id="main-content" tabIndex={-1} className="min-w-0 flex-1">
+        {children}
+      </div>
     </div>
   );
 }

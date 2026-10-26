@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: property.title,
     description: property.description.slice(0, 155),
+    alternates: { canonical: `/properties/${property.slug}` },
     openGraph: { images: [property.images[0]] },
   };
 }

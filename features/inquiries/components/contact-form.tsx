@@ -99,8 +99,8 @@ export function ContactForm() {
             placeholder="Phone number"
             className={fieldClass}
           />
-          {errors.phone && (
-            <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+          {errors.name && (
+            <p role="alert" className="mt-1 text-xs text-red-500">{errors.name}</p>
           )}
         </div>
         <input
@@ -118,12 +118,14 @@ export function ContactForm() {
           placeholder="How can we help you?"
           className="w-full rounded-lg border border-foreground/20 bg-background px-3 py-2 text-sm outline-none focus:border-foreground"
         />
-        {errors.message && (
-          <p className="mt-1 text-xs text-red-500">{errors.message}</p>
+        {errors.name && (
+          <p role="alert" className="mt-1 text-xs text-red-500">{errors.name}</p>
         )}
       </div>
 
-      {serverError && <p className="text-sm text-red-500">{serverError}</p>}
+      {serverError && (
+        <p role="alert" className="mt-1 text-xs text-red-500">{serverError}</p>
+      )}
 
       <TurnstileWidget />
 

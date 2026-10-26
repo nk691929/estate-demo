@@ -9,6 +9,8 @@ import {
   getLeads,
 } from "@/features/leads/services/lead.service";
 import type { LeadStatus } from "@/features/leads/types";
+import { statusStyles } from "@/features/leads/status-styles";
+
 
 const statusFilters: { value: LeadStatus; label: string }[] = [
   { value: "new", label: "New" },
@@ -18,15 +20,6 @@ const statusFilters: { value: LeadStatus; label: string }[] = [
   { value: "won", label: "Won" },
   { value: "lost", label: "Lost" },
 ];
-
-const statusStyles: Record<LeadStatus, string> = {
-  new: "bg-blue-500/15 text-blue-400",
-  contacted: "bg-yellow-500/15 text-yellow-400",
-  viewing: "bg-purple-500/15 text-purple-400",
-  negotiating: "bg-orange-500/15 text-orange-400",
-  won: "bg-green-500/15 text-green-400",
-  lost: "bg-foreground/10 text-foreground/60",
-};
 
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
   dateStyle: "medium",
