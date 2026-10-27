@@ -46,14 +46,24 @@ export function ContactForm() {
     setStatus("sending");
     setServerError(null);
 
-    const result = await submitContact({
-      name,
-      phone,
-      email,
-      message,
-      trap: String(data.get("site_notes") ?? ""),
-      turnstileToken,
-    });
+    let result;
+    try {
+      result = await submitContact({
+        name,
+        phone,
+        email,
+        message,
+        trap: String(data.get("site_notes") ?? ""),
+        turnstileToken,
+      });
+    } catch {
+      resetTurnstile();
+      setStatus("idle");
+      setServerError(
+        "Could not send. Check your connection and try again, or contact us on WhatsApp."
+      );
+      return;
+    }
 
     resetTurnstile();
 
