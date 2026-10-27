@@ -73,3 +73,11 @@ textarea:focus-visible {
 #main-content:focus-visible {
   outline: none;
 }
+
+@media (max-width: 639px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
