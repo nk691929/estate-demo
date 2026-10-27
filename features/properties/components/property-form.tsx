@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import type { PropertyFormValues } from "../validation";
 import { useRouter } from "next/navigation";
+import { LocationPicker } from "./location-picker";
 
 type SaveResult =
   | { ok: true; redirectTo?: string }
@@ -154,14 +155,28 @@ export function PropertyForm({
         />
       </Field>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Latitude">
-          <input {...bind("latitude")} inputMode="decimal" className={inputClass} />
-        </Field>
-        <Field label="Longitude">
-          <input {...bind("longitude")} inputMode="decimal" className={inputClass} />
-        </Field>
-      </div>
+      <LocationPicker
+        latitude={values.latitude}
+        longitude={values.longitude}
+        onChange={(lat, lng) => {
+          set("latitude", lat);
+          set("longitude", lng);
+        }}
+      />
+
+      <details className="rounded-lg border border-foreground/10 p-3">
+        <summary className="cursor-pointer text-sm text-foreground/70">
+          Enter coordinates manually
+        </summary>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <Field label="Latitude">
+            <input {...bind("latitude")} inputMode="decimal" className={inputClass} />
+          </Field>
+          <Field label="Longitude">
+            <input {...bind("longitude")} inputMode="decimal" className={inputClass} />
+          </Field>
+        </div>
+      </details>
 
       <label className="flex items-center gap-3 text-sm">
         <input

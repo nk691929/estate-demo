@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   description: siteConfig.description,
 };
 
+export const instant = false;
+
 export default function RootLayout({
   children,
 }: {
