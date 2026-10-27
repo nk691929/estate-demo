@@ -26,7 +26,7 @@ body {
 }
 
 
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (hover: hover) and (pointer: fine) {
   @supports (animation-timeline: view()) {
     .reveal {
       animation: reveal-up linear both;
